@@ -756,7 +756,7 @@ static ngx_int_t
 ngx_http_auth_spnego_store_delegated_creds(ngx_http_request_t *r,
                                            ngx_str_t *principal_name,
                                            creds_info delegated_creds) {
-    krb5_context kcontext;
+    krb5_context kcontext = NULL;
     krb5_principal principal = NULL;
     krb5_ccache ccache = NULL;
     krb5_error_code kerr = 0;
@@ -1258,7 +1258,7 @@ static ngx_int_t ngx_http_auth_spnego_obtain_server_credentials(
     krb5_ccache ccache = NULL;
     krb5_error_code kerr = 0;
     krb5_principal principal = NULL;
-    krb5_get_init_creds_opt gicopts;
+    krb5_get_init_creds_opt *gicopts = NULL;
     krb5_creds creds;
 
     char *principal_name = NULL;
@@ -1342,8 +1342,9 @@ static ngx_int_t ngx_http_auth_spnego_obtain_server_credentials(
 
     spnego_debug1("Obtaining new credentials for %s", principal_name);
 
-    krb5_get_init_creds_opt_init(&gicopts);
-    krb5_get_init_creds_opt_set_forwardable(&gicopts, 1);
+    //krb5_get_init_creds_opt_init(&gicopts);
+    krb5_get_init_creds_opt_alloc(kcontext,&gicopts);
+    krb5_get_init_creds_opt_set_forwardable(gicopts, 1);
 
     size_t tgs_principal_name_size =
         (ngx_strlen(KRB5_TGS_NAME) + (krb5_realm_length(principal->realm) * 2) + 2) + 1;
@@ -1355,7 +1356,7 @@ static ngx_int_t ngx_http_auth_spnego_obtain_server_credentials(
                  krb5_realm_data(principal->realm));
 
     kerr = krb5_get_init_creds_keytab(kcontext, &creds, principal, keytab, 0,
-                                      tgs_principal_name, &gicopts);
+                                      tgs_principal_name, gicopts);
     if (kerr) {
         spnego_log_error(
             "Kerberos error: Cannot obtain credentials for principal %s",
