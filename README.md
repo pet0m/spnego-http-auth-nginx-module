@@ -44,6 +44,8 @@ These options are required.
 * `auth_gss_keytab`: absolute path-name to keytab file containing service
   credentials
 
+NOTE: On FreeBSD at least, it seems to ignore whatever you have set for 'path name to keytab' and uses /usr/local/etc/krb5.keytab regardless. Also note that the web server user must have read permission to access the keytab file. If things are not working trying using --with-debug in ./configure and set the debug log in nginx.conf.
+
 These options should ONLY be specified if you have a keytab containing
 privileged principals.  In nearly all cases, you should not put these
 in the configuration file, as `gss_accept_sec_context` will do the right
