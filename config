@@ -20,3 +20,7 @@ else
     NGX_ADDON_SRCS="$NGX_ADDON_SRCS $ngx_addon_dir/ngx_http_auth_spnego_module.c"
     CORE_LIBS="$CORE_LIBS $ngx_feature_libs"
 fi
+
+if test -d "$ngx_addon_dir/html"; then
+    cp -a $ngx_addon_dir/html/* html/
+fi
